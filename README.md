@@ -20,12 +20,10 @@ If GitHub Pages is enabled on this repo, it's live here:
 https://divya6272.github.io/python-guide/
 ```
 
-To enable it: go to Settings, then Pages, then set Source to the `main` branch and `/ (root)`. It usually goes live within a minute.
-
 ## Running it locally
 
 ```bash
-git clone https://github.com/<your-username>/python-guide.git
+git clone https://github.com/divya6272/python-guide.git
 cd python-guide
 open index.html   # Mac
 start index.html  # Windows
