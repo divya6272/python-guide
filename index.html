@@ -1,0 +1,850 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:var(--color-background-primary,#fff);color:var(--color-text-primary,#111)}
+.w{padding:1rem 0}
+.top-tabs{display:flex;gap:6px;margin-bottom:1.2rem;flex-wrap:wrap}
+.ttb{padding:5px 14px;border-radius:8px;border:1px solid #ccc;background:transparent;color:#666;font-size:13px;cursor:pointer}
+.ttb.on{background:#dbeafe;color:#1d4ed8;border-color:#93c5fd;font-weight:600}
+.pane{display:none}.pane.on{display:block}
+.sec{font-size:11px;font-weight:600;color:#888;letter-spacing:.05em;text-transform:uppercase;margin:14px 0 7px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px}
+.card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:11px 13px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:#93c5fd}
+.ctitle{font-size:13px;font-weight:600;color:#111;margin-bottom:3px}
+.csub{font-size:11.5px;color:#888}
+.badge{font-size:11px;padding:2px 7px;border-radius:20px;font-weight:600;display:inline-block;margin-bottom:5px}
+.b1{background:#dbeafe;color:#1e40af}
+.b2{background:#dcfce7;color:#166534}
+.b3{background:#fef9c3;color:#854d0e}
+.b4{background:#fce7f3;color:#9d174d}
+.b5{background:#ede9fe;color:#5b21b6}
+.b6{background:#ffedd5;color:#9a3412}
+.back{font-size:12px;color:#888;cursor:pointer;margin-bottom:12px;display:inline-flex;align-items:center;gap:4px}
+.back:hover{color:#111}
+.stabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.stb{padding:4px 11px;border-radius:8px;border:1px solid #ccc;background:transparent;color:#666;font-size:12px;cursor:pointer}
+.stb.on{background:#dbeafe;color:#1d4ed8;border-color:#93c5fd;font-weight:600}
+.sp{display:none}.sp.on{display:block}
+.why{font-size:13px;color:#555;line-height:1.65;padding:8px 12px;background:#f3f4f6;border-radius:8px;margin-bottom:8px;border-left:3px solid #93c5fd}
+.why b{color:#111}
+pre{font-family:'Fira Mono',monospace;background:#1e1e2e;padding:12px 14px;border-radius:8px;font-size:12.5px;line-height:1.9;color:#cdd6f4;white-space:pre;overflow-x:auto;margin-bottom:0}
+.c1{color:#a6e3a1}.c2{color:#f38ba8}.c3{color:#89b4fa}.c4{color:#cba6f7}.c5{color:#f9e2af}.c6{color:#94e2d5}
+.lname{font-size:15px;font-weight:600;margin-bottom:10px;color:#111}
+.qa{border:1px solid #e5e7eb;border-radius:10px;margin-bottom:8px;overflow:hidden}
+.qa-q{padding:10px 14px;cursor:pointer;font-size:13px;font-weight:600;color:#111;display:flex;justify-content:space-between;align-items:center;gap:8px;background:#f9fafb}
+.qa-a{display:none;padding:10px 14px;font-size:13px;color:#444;line-height:1.7;border-top:1px solid #e5e7eb}
+.qa-a.on{display:block}
+.qa-a code{font-family:monospace;font-size:12px;background:#f3f4f6;padding:1px 5px;border-radius:3px;color:#111}
+.qa-a pre{margin-top:8px}
+</style>
+</head>
+<body>
+<div class="w">
+<div class="top-tabs">
+  <button class="ttb on" onclick="showTab('topics',this)">📚 All Topics</button>
+  <button class="ttb" onclick="showTab('interview',this)">🎯 Interview Q&A</button>
+  <button class="ttb" onclick="showTab('gotchas',this)">⚠️ Gotchas</button>
+</div>
+
+<div id="tab-topics" class="pane on">
+  <div id="home-view">
+    <div class="sec">basics</div><div class="grid" id="g-basics"></div>
+    <div class="sec">functions</div><div class="grid" id="g-functions"></div>
+    <div class="sec">oop</div><div class="grid" id="g-oop"></div>
+    <div class="sec">advanced</div><div class="grid" id="g-advanced"></div>
+    <div class="sec">ds / ml</div><div class="grid" id="g-ds"></div>
+    <div class="sec">must know for interviews</div><div class="grid" id="g-must"></div>
+  </div>
+  <div id="lesson-view" style="display:none">
+    <div class="back" onclick="goHome()">← back</div>
+    <div id="lesson-body"></div>
+  </div>
+</div>
+<div id="tab-interview" class="pane"><div id="qaList"></div></div>
+<div id="tab-gotchas" class="pane"><div id="gotchaList"></div></div>
+</div>
+
+<script>
+const topics = {
+  basics:[
+    {id:'variables',badge:'b1',title:'Variables & Types',tabs:['basics','type checking','casting'],
+     why:['Store data. Python is dynamically typed — no need to declare type.','Check what type a variable is at runtime.','Convert between types explicitly.'],
+     code:[
+`name = "Divya"     # str
+age  = 21          # int
+gpa  = 9.2         # float
+is_student = True  # bool
+nothing = None     # NoneType`,
+`type("hello")   # <class 'str'>
+type(21)        # <class 'int'>
+isinstance(21, int)   # True
+isinstance("hi", str) # True`,
+`int("42")      # 42
+float("3.14")  # 3.14
+str(99)        # "99"
+bool(0)        # False
+bool(1)        # True
+list((1,2,3))  # [1,2,3]`]},
+
+    {id:'strings',badge:'b1',title:'Strings',tabs:['basics','methods','formatting','slicing'],
+     why:['Strings are immutable sequences of characters. Most common data type in interviews.','Built-in methods save you from writing loops.','f-strings are the modern way to build strings.','Slicing lets you extract parts of a string without a loop.'],
+     code:[
+`s = "hello world"
+len(s)          # 11
+s[0]            # 'h'
+s[-1]           # 'd'
+"lo" in s       # True`,
+`s.upper()       # 'HELLO WORLD'
+s.lower()       # 'hello world'
+s.strip()       # removes whitespace
+s.replace("world","Python")
+s.split(" ")    # ['hello','world']
+s.startswith("he")  # True
+s.count("l")    # 3
+s.find("o")     # 4`,
+`name = "Divya"
+age  = 21
+f"My name is {name}, age {age}"
+# 'My name is Divya, age 21'
+f"{3.14159:.2f}"   # '3.14'`,
+`s = "hello"
+s[1:3]    # 'el'
+s[::-1]   # 'olleh' — reverse
+s[::2]    # 'hlo'  — every 2nd char`]},
+
+    {id:'lists',badge:'b1',title:'Lists',tabs:['basics','methods','comprehension'],
+     why:['Most used data structure. Ordered, mutable, allows duplicates.','Built-in methods cover 90% of what you need.','Comprehension = shorter and faster than a for loop.'],
+     code:[
+`a = [1,2,3,4,2]
+a[0]        # 1
+a[-1]       # 2
+len(a)      # 5
+2 in a      # True`,
+`a.append(5)      # add to end
+a.insert(0,99)   # add at index
+a.remove(2)      # remove first 2
+a.pop()          # remove & return last
+a.sort()         # sort in place
+sorted(a)        # returns new sorted list
+a.reverse()
+a.count(2)       # count occurrences
+a.index(3)       # find index`,
+`[x*x for x in range(5)]
+# [0,1,4,9,16]
+
+[x for x in range(10) if x%2==0]
+# [0,2,4,6,8]
+
+["E" if x%2==0 else "O" for x in range(4)]
+# ['E','O','E','O']`]},
+
+    {id:'tuples',badge:'b1',title:'Tuples',tabs:['basics','use cases'],
+     why:['Immutable list. Faster, uses less memory. Hashable — can be dict key.','Use tuples for fixed data, coordinates, dict keys, function return values.'],
+     code:[
+`t = (1,2,3)
+t[0]          # 1
+x,y,z = t     # unpack
+a,*rest = t   # a=1, rest=[2,3]
+single = (42,)  # trailing comma needed!
+(42)            # just int — NOT a tuple`,
+`# 1. dict key
+d = {(0,0):"origin", (1,2):"point A"}
+
+# 2. return multiple values
+def minmax(lst): return min(lst),max(lst)
+lo,hi = minmax([3,1,4,1,5])
+
+# 3. named tuple
+from collections import namedtuple
+Point = namedtuple("Point",["x","y"])
+p = Point(3,4)
+p.x  # 3`]},
+
+    {id:'sets',badge:'b1',title:'Sets',tabs:['basics','set math'],
+     why:['Unordered, unique items, O(1) lookup. Use to remove duplicates or check membership fast.','Set math solves many interview problems in one line.'],
+     code:[
+`s = {1,2,2,3}   # {1,2,3} auto dedup
+s.add(4)
+s.remove(2)      # KeyError if missing
+s.discard(99)    # safe
+2 in s           # True O(1)
+s = set()        # empty set — NOT {}`,
+`A = {1,2,3,4}; B = {3,4,5,6}
+A | B   # union      {1,2,3,4,5,6}
+A & B   # intersect  {3,4}
+A - B   # difference {1,2}
+A ^ B   # symmetric  {1,2,5,6}
+
+# remove dupes from list:
+list(set([1,2,2,3,3]))  # [1,2,3]`]},
+
+    {id:'dicts',badge:'b1',title:'Dictionaries',tabs:['basics','methods','comprehension'],
+     why:['Key-value pairs. O(1) lookup. Most important data structure for interviews — used in almost every solution.','Methods to safely access, update, iterate.','Build dicts from existing data in one line.'],
+     code:[
+`d = {"name":"Divya","age":21}
+d["name"]          # 'Divya'
+d["city"] = "Indore"  # add
+del d["age"]          # delete
+"name" in d           # True`,
+`d.get("x", 0)       # 0 — safe, no KeyError
+d.keys()
+d.values()
+d.items()            # (key,value) pairs
+d.update({"age":21}) # merge
+d.setdefault("score",0)  # set only if missing`,
+`{x: x*x for x in range(5)}
+# {0:0,1:1,2:4,3:9,4:16}
+
+scores={"A":90,"B":40,"C":75}
+{k:v for k,v in scores.items() if v>=60}
+# {'A':90,'C':75}`]},
+
+    {id:'operators',badge:'b1',title:'Operators',tabs:['types','useful tricks'],
+     why:['Know all operators — interviews test these implicitly in every problem.','Python has clean shortcuts that reduce code length.'],
+     code:[
+`# arithmetic
++  -  *  /   # basic
+//  # floor division  7//2 = 3
+%   # modulo          7%2  = 1
+**  # power           2**3 = 8
+
+# comparison
+==  !=  >  <  >=  <=
+is  is not   # identity
+in  not in   # membership
+
+# logical
+and  or  not`,
+`# ternary
+x = "even" if n%2==0 else "odd"
+
+# walrus := (assign + use in one line)
+if (n := len(a)) > 5: print(n)
+
+# chained comparison
+1 < x < 10   # Pythonic range check
+
+# unpacking
+a,b = b,a    # swap without temp var`]},
+  ],
+
+  functions:[
+    {id:'functions',badge:'b2',title:'Functions',tabs:['basics','*args','**kwargs','defaults','lambda'],
+     why:['Reusable block of code. Fundamental building block.','Accept any number of positional arguments.','Accept any number of keyword arguments.','Fallback value when caller skips an argument.','One-line throwaway function for sorted/map/filter.'],
+     code:[
+`def add(a,b):
+    return a+b
+add(3,4)   # 7
+
+def greet(name):
+    return f"Hello {name}"`,
+`def total(*args):    # args is a tuple
+    return sum(args)
+total(1,2,3)    # 6
+total(1,2,3,4)  # 10`,
+`def info(**kwargs):  # kwargs is a dict
+    print(kwargs)
+info(name="Divya",age=21)
+# {'name':'Divya','age':21}`,
+`def greet(name="User"):
+    print("Hi",name)
+greet()          # Hi User
+greet("Divya")   # Hi Divya
+# NEVER use list/dict as default:
+def f(lst=None):
+    if lst is None: lst=[]`,
+`square = lambda x: x*x
+square(9)   # 81
+# useful with sorted:
+names=["Tanveer","Divya","Chirag"]
+sorted(names, key=lambda n:len(n))
+# ['Divya','Chirag','Tanveer']`]},
+
+    {id:'scope',badge:'b2',title:'Scope & LEGB',tabs:['LEGB','global','nonlocal'],
+     why:['Python looks up names in this order: Local→Enclosing→Global→Built-in.','Use global to write to module-level variable from inside a function.','Use nonlocal to write to an enclosing function\'s variable (closures).'],
+     code:[
+`x = "global"
+def outer():
+    x = "enclosing"
+    def inner():
+        x = "local"
+        print(x)   # local ← L wins
+    inner()
+    print(x)       # enclosing
+outer()
+print(x)           # global`,
+`count = 0
+def increment():
+    global count
+    count += 1
+increment(); increment()
+print(count)  # 2`,
+`def make_counter():
+    n = 0
+    def counter():
+        nonlocal n
+        n += 1
+        return n
+    return counter
+c = make_counter()
+c()  # 1
+c()  # 2`]},
+
+    {id:'closures',badge:'b2',title:'Closures',tabs:['basics'],
+     why:['Inner function remembers outer variables even after outer has returned. Basis of decorators and callbacks.'],
+     code:[
+`def outer(x):
+    def inner(y):
+        return x + y   # x is "closed over"
+    return inner
+
+add5 = outer(5)
+add5(3)   # 8  — x=5 still remembered
+add5(10)  # 15
+
+# real use: factory functions
+def multiplier(n):
+    return lambda x: x*n
+double = multiplier(2)
+double(7)  # 14`]},
+  ],
+
+  oop:[
+    {id:'classes',badge:'b3',title:'Classes & Objects',tabs:['basics','__init__'],
+     why:['Blueprint for creating objects. Keeps related data and functions together.','__init__ runs automatically when object is created. Sets up initial state.'],
+     code:[
+`class Dog:
+    def __init__(self,name,age):
+        self.name = name
+        self.age  = age
+    def bark(self):
+        return f"{self.name} says Woof"
+
+d = Dog("Bruno",3)
+d.bark()    # Bruno says Woof
+d.name      # Bruno`,
+`class Student:
+    def __init__(self,name,gpa):
+        self.name = name
+        self.gpa  = gpa
+    def is_pass(self):
+        return self.gpa >= 6.0
+
+s = Student("Divya",9.2)
+s.is_pass()  # True`]},
+
+    {id:'pillars',badge:'b3',title:'4 Pillars',tabs:['encapsulation','inheritance','polymorphism','abstraction'],
+     why:['Hide internal data. Protect from accidental change.','Child reuses parent code. Avoid repetition.','Same interface, different behaviour per class.','Force child classes to implement required methods.'],
+     code:[
+`class Account:
+    def __init__(self,bal):
+        self.__bal = bal     # private
+    def get(self): return self.__bal
+    def deposit(self,n):
+        if n>0: self.__bal+=n
+
+a = Account(1000)
+a.get()      # 1000
+a.__bal      # AttributeError`,
+`class Animal:
+    def __init__(self,name): self.name=name
+    def speak(self): return "..."
+
+class Dog(Animal):
+    def speak(self): return f"{self.name}: Woof"
+
+class Cat(Animal):
+    def speak(self): return f"{self.name}: Meow"
+
+Dog("Bruno").speak()  # Bruno: Woof`,
+`animals = [Dog("Bruno"), Cat("Kitty")]
+for a in animals:
+    print(a.speak())
+# Bruno: Woof
+# Kitty: Meow
+# same method, different result — polymorphism`,
+`from abc import ABC, abstractmethod
+class Shape(ABC):
+    @abstractmethod
+    def area(self): pass
+
+class Circle(Shape):
+    def __init__(self,r): self.r=r
+    def area(self): return 3.14*self.r**2
+
+Shape()          # TypeError
+Circle(5).area() # 78.5`]},
+
+    {id:'dunder',badge:'b3',title:'Magic Methods',tabs:['__str__/__repr__','__eq__/__lt__','__len__/__add__'],
+     why:['Control how your object looks when printed or in REPL.','Enable == and < comparisons. sorted() works automatically once you define __lt__.','__len__ powers len(). __add__ powers +.'],
+     code:[
+`class Book:
+    def __init__(self,t,p): self.t=t;self.p=p
+    def __str__(self):  return self.t       # for users
+    def __repr__(self): return f"Book('{self.t}',{self.p})"  # for devs
+
+b = Book("Deep Work",499)
+print(b)    # Deep Work        ← __str__
+repr(b)     # Book('Deep Work',499) ← __repr__`,
+`class Student:
+    def __init__(self,name,gpa): self.gpa=gpa;self.name=name
+    def __eq__(self,o): return self.gpa==o.gpa
+    def __lt__(self,o): return self.gpa<o.gpa
+    def __repr__(self): return f"{self.name}({self.gpa})"
+
+s=[Student("A",9.2),Student("B",8.8),Student("C",9.5)]
+sorted(s)   # [B(8.8),A(9.2),C(9.5)]`,
+`class Bag:
+    def __init__(self,items): self.items=items
+    def __len__(self): return len(self.items)
+    def __add__(self,o): return Bag(self.items+o.items)
+
+b1=Bag([1,2]); b2=Bag([3,4])
+len(b1)      # 2
+b3=b1+b2; len(b3)  # 4`]},
+
+    {id:'classmethods',badge:'b3',title:'@classmethod @staticmethod @property',tabs:['@classmethod','@staticmethod','@property'],
+     why:['Gets cls. Used for alt constructors or tracking class-level state.','Gets nothing. Pure utility function grouped with the class.','Attribute-style getter/setter with validation. Clean API.'],
+     code:[
+`class Dog:
+    count = 0
+    def __init__(self,name):
+        Dog.count += 1
+    @classmethod
+    def total(cls): return cls.count
+    @classmethod
+    def from_dict(cls,d): return cls(d["name"])
+
+Dog("Bruno"); Dog("Bella")
+Dog.total()             # 2
+Dog.from_dict({"name":"Max"}).name  # Max`,
+`class MathUtils:
+    @staticmethod
+    def is_even(n): return n%2==0
+    @staticmethod
+    def clamp(val,lo,hi): return max(lo,min(val,hi))
+
+MathUtils.is_even(4)        # True
+MathUtils.clamp(15,0,10)    # 10`,
+`class Student:
+    def __init__(self,age): self._age=age
+    @property
+    def age(self): return self._age
+    @age.setter
+    def age(self,val):
+        if val<0: raise ValueError("negative!")
+        self._age=val
+
+s=Student(20)
+s.age        # 20  ← looks like attribute
+s.age = 21   # ← calls setter`]},
+  ],
+
+  advanced:[
+    {id:'decorators',badge:'b4',title:'Decorators',tabs:['basics','@wraps','stacking'],
+     why:['Add behaviour to a function without changing it. Used in Flask, Django, logging, auth.','Preserves function name and docstring after decorating.','Multiple decorators — applied bottom-up, run top-down.'],
+     code:[
+`from functools import wraps
+def shout(func):
+    @wraps(func)
+    def wrapper(*a,**kw):
+        print("before")
+        r = func(*a,**kw)
+        print("after")
+        return r
+    return wrapper
+
+@shout
+def greet(): print("Hello")
+greet()
+# before / Hello / after`,
+`# without @wraps:
+greet.__name__  # 'wrapper' ✗
+greet.__doc__   # None ✗
+# with @wraps:
+greet.__name__  # 'greet'   ✓`,
+`@bold      # runs first on call
+@italic
+@underline # closest to function
+def text(): return "hi"
+# same as: bold(italic(underline(text)))
+# rule: top decorator runs first`]},
+
+    {id:'generators',badge:'b4',title:'Generators',tabs:['basics','vs list'],
+     why:['yield gives one value at a time. Never builds the whole list in memory. Perfect for large data.','Generator is memory efficient. List loads everything at once.'],
+     code:[
+`def count_up(n):
+    for i in range(n):
+        yield i          # pauses here each time
+
+g = count_up(3)
+next(g)  # 0
+next(g)  # 1
+next(g)  # 2
+
+# in a for loop:
+for x in count_up(5): print(x)`,
+`# list — all 1M items in memory:
+[x*x for x in range(1_000_000)]
+
+# generator — one at a time:
+(x*x for x in range(1_000_000))
+
+# use generator when:
+sum(x*x for x in range(1_000_000))
+# memory: generator wins always`]},
+
+    {id:'exceptions',badge:'b4',title:'Exceptions',tabs:['basics','custom','raise'],
+     why:['Handle runtime errors gracefully. Prevent program crash.','Create domain-specific errors for clean code.','Throw errors manually when input is invalid.'],
+     code:[
+`try:
+    x = int("abc")
+except ValueError as e:
+    print("bad input:", e)
+except (TypeError, KeyError):
+    print("other error")
+else:
+    print("success")    # only if no error
+finally:
+    print("always runs")`,
+`class AgeError(Exception):
+    pass
+
+class NegativeError(ValueError):
+    def __init__(self,val):
+        super().__init__(f"{val} is negative")`,
+`def divide(a,b):
+    if b==0: raise ZeroDivisionError("no zeros!")
+    return a/b
+
+def set_age(age):
+    if not isinstance(age,int): raise TypeError
+    if age<0: raise AgeError("negative!")`]},
+
+    {id:'contextmanager',badge:'b4',title:'Context Managers',tabs:['with','custom'],
+     why:['with auto-closes/cleans up even if an error occurs. Used for files, DB connections, locks.','Build your own with contextlib.'],
+     code:[
+`# bad — file may not close on error:
+f = open("file.txt")
+data = f.read()
+f.close()
+
+# good — always closes:
+with open("file.txt") as f:
+    data = f.read()
+# also used for:
+with lock:  pass      # threading
+with db.transaction(): pass  # DB`,
+`from contextlib import contextmanager
+import time
+
+@contextmanager
+def timer():
+    start = time.time()
+    yield
+    print(f"took {time.time()-start:.2f}s")
+
+with timer():
+    sum(range(1_000_000))
+# took 0.03s`]},
+
+    {id:'iterators',badge:'b4',title:'Iterators',tabs:['basics'],
+     why:['Any object with __iter__ + __next__ is iterable. for loops use this protocol under the hood.'],
+     code:[
+`class CountUp:
+    def __init__(self,n): self.i=0;self.n=n
+    def __iter__(self): return self
+    def __next__(self):
+        if self.i>=self.n: raise StopIteration
+        self.i+=1; return self.i
+
+for x in CountUp(3): print(x)  # 1 2 3
+
+# built-ins return iterators:
+it = iter([10,20,30])
+next(it)  # 10
+next(it)  # 20`]},
+  ],
+
+  ds:[
+    {id:'numpy',badge:'b5',title:'NumPy',tabs:['arrays','operations'],
+     why:['C-backed contiguous memory → much faster than Python lists for math.','Vectorized operations — no Python loop needed.'],
+     code:[
+`import numpy as np
+a = np.array([1,2,3,4,5])
+np.zeros((3,3))    # 3x3 zeros
+np.ones((2,4))     # 2x4 ones
+a.shape            # (5,)
+a.reshape(1,5)     # [[1,2,3,4,5]]
+a.dtype            # int64`,
+`a = np.array([1,2,3,4,5])
+a*2             # [2,4,6,8,10]
+a+10            # [11,12,13,14,15]
+a[a>3]          # [4,5]  boolean index
+a.mean()        # 3.0
+a.sum()         # 15
+a.max(); a.min()`]},
+
+    {id:'pandas',badge:'b5',title:'Pandas',tabs:['basics','loc/iloc','groupby/merge'],
+     why:['DataFrame = table in Python. Used for data cleaning and analysis.','Select specific rows and columns.','Aggregate data. Join two tables.'],
+     code:[
+`import pandas as pd
+df = pd.DataFrame({
+    "name":["Divya","Tanveer","Chirag"],
+    "score":[90,85,78]
+})
+df.head()       # first 5 rows
+df.info()       # types + nulls
+df.describe()   # stats
+df.shape        # (3,2)`,
+`df.loc[0,"name"]      # 'Divya' — by label
+df.iloc[0,1]          # 90     — by position
+df[df["score"]>80]    # filter rows
+df["score"].mean()    # 84.3`,
+`df.groupby("dept")["salary"].mean()
+pd.merge(df1, df2, on="id")  # join
+df.fillna(0)     # replace NaN
+df.dropna()      # remove NaN rows`]},
+  ],
+
+  must:[
+    {id:'collections',badge:'b6',title:'collections module',tabs:['Counter','defaultdict','deque'],
+     why:['Count occurrences in one line. Used in almost every string/array interview problem.','Dict that never raises KeyError. Saves if-key-exists boilerplate.','O(1) append and popleft. Use instead of list for queues.'],
+     code:[
+`from collections import Counter
+Counter("banana")
+# Counter({'a':3,'n':2,'b':1})
+
+Counter([1,2,2,3,3,3]).most_common(2)
+# [(3,3),(2,2)]
+
+# anagram check:
+Counter("listen") == Counter("silent")  # True`,
+`from collections import defaultdict
+d = defaultdict(int)
+for w in "hello world".split():
+    d[w] += 1   # no KeyError ever
+
+groups = defaultdict(list)
+for i,v in enumerate([1,2,1,3]):
+    groups[v].append(i)
+# {1:[0,2], 2:[1], 3:[3]}`,
+`from collections import deque
+q = deque([1,2,3])
+q.append(4)       # right: [1,2,3,4]
+q.appendleft(0)   # left:  [0,1,2,3,4]
+q.popleft()       # 0  O(1) ← fast!
+# list.pop(0) = O(n) — slow for BFS/queue`]},
+
+    {id:'typehints',badge:'b6',title:'Type Hints',tabs:['basics'],
+     why:['Makes code readable. Used in all production code. IDEs use it for autocomplete. Interviewers notice clean typed code.'],
+     code:[
+`def add(a: int, b: int) -> int:
+    return a+b
+
+name: str = "Divya"
+scores: list[int] = [90,85]
+
+from typing import Optional, Union
+def greet(name: Optional[str]=None) -> str:
+    return f"Hi {name or 'User'}"
+
+def process(x: Union[int,str]) -> str:
+    return str(x)
+
+# Python doesn't enforce these at runtime
+# but they document intent clearly`]},
+
+    {id:'memory',badge:'b6',title:'Memory Model',tabs:['id & is','mutable vs immutable','copy'],
+     why:['id() is memory address. is checks same object. == checks same value.','Mutable = can change in place. Immutable = creates new object on change.','Shallow copy shares inner objects. Deep copy is fully independent.'],
+     code:[
+`a = [1,2,3]
+b = a          # same object
+b is a         # True
+b.append(4)
+print(a)       # [1,2,3,4] ← changed!
+
+b = a.copy()   # now separate
+b is a         # False
+b.append(5)
+print(a)       # [1,2,3,4] ← unchanged`,
+`# immutable: int,str,tuple,float,bool
+x = "hello"
+x += " world"  # new string object
+
+# mutable: list,dict,set
+lst = [1,2]
+lst.append(3)  # same object modified
+
+# why it matters:
+def f(lst): lst.append(99)
+a = [1,2]
+f(a); print(a)  # [1,2,99] ← surprise!`,
+`import copy
+a = [[1,2],[3,4]]
+b = a.copy()         # shallow
+b[0].append(99)
+print(a[0])          # [1,2,99] ← shared!
+
+c = copy.deepcopy(a) # deep
+c[0].append(0)
+print(a[0])          # [1,2,99] ← untouched`]},
+
+    {id:'builtins',badge:'b6',title:'Built-in Functions',tabs:['must know'],
+     why:['These built-ins solve interview problems in one line. Know all of them.'],
+     code:[
+`# enumerate — index + value
+for i,v in enumerate(["a","b","c"]):
+    print(i,v)   # 0 a / 1 b / 2 c
+
+# zip — combine lists
+list(zip([1,2,3],["a","b","c"]))
+# [(1,'a'),(2,'b'),(3,'c')]
+
+# map — transform every element
+list(map(lambda x:x*2, [1,2,3]))  # [2,4,6]
+
+# filter — keep matching
+list(filter(lambda x:x>2,[1,2,3,4]))  # [3,4]
+
+# sorted with key
+sorted([3,1,2])            # [1,2,3]
+sorted("bac")              # ['a','b','c']
+sorted(words,key=len)      # by length
+
+# any / all
+any([False,True,False])    # True
+all([True,True,True])      # True
+
+# min / max with key
+min(words, key=len)        # shortest word`]},
+
+    {id:'fstring',badge:'b6',title:'f-strings & string tricks',tabs:['f-strings','useful tricks'],
+     why:['f-strings are the fastest and cleanest way to format strings in Python.','String tricks that show up constantly in interviews.'],
+     code:[
+`name="Divya"; score=9.2
+f"Name: {name}"            # 'Name: Divya'
+f"Score: {score:.1f}"      # 'Score: 9.2'
+f"{'hello':>10}"           # right align
+f"{42:05d}"                # '00042' zero pad
+f"{1_000_000:,}"           # '1,000,000'`,
+`# reverse a string
+s[::-1]
+
+# check palindrome
+s == s[::-1]
+
+# join list into string
+"-".join(["a","b","c"])   # 'a-b-c'
+
+# split and strip
+"  hello  ".strip()        # 'hello'
+"a,b,c".split(",")         # ['a','b','c']
+
+# char ↔ number
+ord('a')   # 97
+chr(97)    # 'a'`]},
+  ]
+};
+
+const qs=[
+  {q:"list vs tuple — difference?",a:"List = mutable, tuple = immutable + hashable. Tuple can be a dict key, list cannot. Tuple is faster."},
+  {q:"What is the GIL?",a:"Global Interpreter Lock. Only one thread runs Python at a time. Use <code>multiprocessing</code> for CPU tasks. <code>threading</code> only for I/O."},
+  {q:"*args vs **kwargs?",a:"<code>*args</code> = extra positionals → arrives as tuple. <code>**kwargs</code> = extra keywords → arrives as dict."},
+  {q:"__str__ vs __repr__?",a:"<code>__str__</code> for users → called by print(). <code>__repr__</code> for devs → called in REPL. Always define __repr__ at minimum."},
+  {q:"@classmethod vs @staticmethod?",a:"<code>@classmethod</code> gets cls → class state or alt constructor. <code>@staticmethod</code> gets nothing → utility function."},
+  {q:"What does @wraps do?",a:"Preserves __name__ and __doc__ after decorating. Without it function is renamed 'wrapper'."},
+  {q:"What is a generator?",a:"Uses <code>yield</code>. One value at a time. Memory efficient — nothing stored upfront."},
+  {q:"Encapsulation vs Abstraction?",a:"Encapsulation = hide data (__). Abstraction = hide implementation (ABC). Car: hidden engine = encapsulation. Steering wheel only = abstraction."},
+  {q:"What is LEGB?",a:"Name lookup order: Local → Enclosing → Global → Built-in. Stops at first match."},
+  {q:"What is a closure?",a:"Inner function remembers outer variables even after outer function has returned."},
+  {q:"What does @property do?",a:"Turns a method into an attribute-style getter/setter. Adds validation without changing how you access it."},
+  {q:"Shallow vs deep copy?",a:"Shallow = outer copied, inner still shared. Deep = fully independent copy of everything."},
+  {q:"Counter vs defaultdict?",a:"<code>Counter</code> counts occurrences. <code>defaultdict</code> returns a default value instead of raising KeyError."},
+  {q:"What is nonlocal?",a:"Lets inner function write to a variable in the enclosing (outer) function scope."},
+  {q:"is vs ==?",a:"<code>==</code> checks value. <code>is</code> checks same object in memory (same id). Always use == for value comparison."},
+  {q:"Why is dict O(1) lookup?",a:"Uses a hash table internally. Hash of key maps directly to memory location — no scanning needed."},
+  {q:"mutable vs immutable?",a:"Immutable: int, str, tuple, float — cannot change in place, new object created. Mutable: list, dict, set — change in place."},
+  {q:"What is a context manager?",a:"<code>with</code> statement. Calls __enter__ on open, __exit__ on close even if error occurs. Used for files, locks, timers."},
+];
+
+const gotchas=[
+  {q:"Mutable default argument",code:`def f(lst=[]):      # BAD — shared across all calls\n    lst.append(1)\ndef f(lst=None):    # GOOD\n    if lst is None: lst = []`},
+  {q:"b = a copies the reference, not the list",code:`a = [1,2,3]\nb = a\nb.append(4)\nprint(a)   # [1,2,3,4] ← surprise!\nb = a.copy()  # fix`},
+  {q:"is vs == with integers",code:`a=256;b=256; a is b  # True (cached)\na=257;b=257; a is b  # False\n# always use ==`},
+  {q:"Empty set must be set()",code:`x = {}       # dict!\nx = set()    # correct`},
+  {q:"List multiplication trap",code:`grid=[[0]*3]*3\ngrid[0][0]=9  # [[9,0,0],[9,0,0],[9,0,0]] all same!\n# Fix:\ngrid=[[0]*3 for _ in range(3)]`},
+  {q:"Late binding in closures",code:`fns=[lambda:i for i in range(3)]\n[f() for f in fns]  # [2,2,2] wrong!\n# Fix:\nfns=[lambda i=i:i for i in range(3)]`},
+  {q:"UnboundLocalError",code:`x=10\ndef f():\n    print(x)   # UnboundLocalError!\n    x=20       # Python treats x as local throughout\n# Fix: global x`},
+  {q:"dict.get() vs dict[key]",code:`d={"a":1}\nd["b"]        # KeyError\nd.get("b",0)  # 0 — safe`},
+];
+
+function render(){
+  const map={basics:'g-basics',functions:'g-functions',oop:'g-oop',advanced:'g-advanced',ds:'g-ds',must:'g-must'};
+  Object.entries(topics).forEach(([sec,list])=>{
+    document.getElementById(map[sec]).innerHTML=list.map(t=>`
+      <div class="card" onclick="open_('${sec}','${t.id}')">
+        <div class="badge ${t.badge}">${sec}</div>
+        <div class="ctitle">${t.title}</div>
+        <div class="csub">${t.tabs.slice(0,3).join(' · ')}</div>
+      </div>`).join('');
+  });
+
+  document.getElementById('qaList').innerHTML=qs.map((q,i)=>`
+    <div class="qa">
+      <div class="qa-q" onclick="tq('q${i}')"><span>${q.q}</span><span>+</span></div>
+      <div class="qa-a" id="q${i}">${q.a}</div>
+    </div>`).join('');
+
+  document.getElementById('gotchaList').innerHTML=gotchas.map((g,i)=>`
+    <div class="qa">
+      <div class="qa-q" onclick="tq('g${i}')"><span>${g.q}</span><span>+</span></div>
+      <div class="qa-a" id="g${i}"><pre>${g.code}</pre></div>
+    </div>`).join('');
+}
+
+function open_(sec,id){
+  const t=topics[sec].find(x=>x.id===id);
+  document.getElementById('home-view').style.display='none';
+  document.getElementById('lesson-view').style.display='block';
+  const stabs=t.tabs.map((tab,i)=>
+    `<button class="stb${i===0?' on':''}" onclick="ss(${i},this)">${tab}</button>`
+  ).join('');
+  const sps=t.tabs.map((tab,i)=>`
+    <div id="sp-${i}" class="sp${i===0?' on':''}">
+      <div class="why">${t.why[i]}</div>
+      <pre>${t.code[i]}</pre>
+    </div>`).join('');
+  document.getElementById('lesson-body').innerHTML=
+    `<div class="lname">${t.title}</div><div class="stabs">${stabs}</div>${sps}`;
+}
+
+function goHome(){
+  document.getElementById('home-view').style.display='block';
+  document.getElementById('lesson-view').style.display='none';
+}
+
+function tq(id){document.getElementById(id).classList.toggle('on')}
+
+function showTab(n,btn){
+  document.querySelectorAll('.top-tabs>.ttb').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#tab-topics,#tab-interview,#tab-gotchas').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tab-'+n).classList.add('on');
+  btn.classList.add('on');
+}
+
+function ss(i,btn){
+  btn.closest('.stabs').querySelectorAll('.stb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('[id^="sp-"]').forEach(p=>p.classList.remove('on'));
+  document.getElementById('sp-'+i).classList.add('on');
+}
+
+render();
+</script>
+</body>
+</html>
