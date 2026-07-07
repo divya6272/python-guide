@@ -17,7 +17,7 @@ No build step, no dependencies. The whole thing lives in a single `index.html` f
 If GitHub Pages is enabled on this repo, it's live here:
 
 ```
-https://<your-username>.github.io/python-guide/
+https://divya6272.github.io/python-guide/
 ```
 
 To enable it: go to Settings, then Pages, then set Source to the `main` branch and `/ (root)`. It usually goes live within a minute.
